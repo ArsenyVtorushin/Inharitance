@@ -52,9 +52,6 @@ private:
 	int a;
 };
 
-Base::Base()
-{
-}
 Base::Base(int all)
 {
 	this->a = all;
@@ -128,7 +125,8 @@ bool operator!=(const Base& a, const Base& b)
 class Derived : public Base
 {
 public:
-	Derived();
+	Derived() = default;
+	Derived(int a, int b, int c) : Base(a, b), c(c) {} // пол€ a, b мы заставл€ем инициализировать конструктор родител€
 	~Derived();
 
 	int getC()const;
@@ -136,13 +134,15 @@ public:
 
 	int FullSum()const;
 
+	void Clear();
+
+protected:
+	void ClearC();
+
 private:
 	int c;
 };
 
-Derived::Derived()
-{
-}
 Derived::~Derived()
 {
 }
@@ -151,7 +151,6 @@ int Derived::getC() const
 {
 	return this->c;
 }
-
 void Derived::setC(int c)
 {
 	this->c = c;
@@ -159,12 +158,25 @@ void Derived::setC(int c)
 
 int Derived::FullSum() const
 {
-	return this->a + this->b + this->c;
+	return this->getA() + this->b + this->c;
+}
+
+void Derived::Clear()
+{
+	Base::Clear();
+	this->ClearC();
+}
+
+void Derived::ClearC()
+{
+	this->c = 0;
 }
 
 
 int main()
 {
+	system("color 0F");
+
 	Base obj1;
 	Base obj2(1, 3);
 
@@ -172,7 +184,7 @@ int main()
 	obj1 != obj2;
 	
 //	obj1 == 2; // программа сама создоаст объект Base вместо 2 и сравнит
-//	2 == obj1; //  компил€тор делает вид что пон€ти€ не имеет что и с чем сравнивать
+//	2 == obj1; // компил€тор делает вид что пон€ти€ не имеет что и с чем сравнивать
 
 	obj1 != 2;
 	2 != obj1;
@@ -181,10 +193,21 @@ int main()
 	// когда оператор создан как внешн€€ функци€
 	// компил€тор в любом случае сравнение проведет
 
-	Derived objDer1;
-	objDer1.setA(4);
+	Derived objDer1(4, 3, 7);
+	/*objDer1.setA(4);
 	objDer1.setB(7);
-	std::cout << objDer1.FullSum();
+	objDer1.setC(4);*/
+	std::cout << objDer1.FullSum() << '\n';
+	objDer1 == obj2;
+
+
+	std::cout << obj2.FullSum() << '\n';
+	obj2.Clear();
+	std::cout << obj2.FullSum() << '\n';
+
+	std::cout << objDer1.FullSum() << '\n';
+	obj2.Clear();
+	std::cout << objDer1.FullSum() << '\n';
 
 	return 0;
 }
